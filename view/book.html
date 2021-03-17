@@ -1,41 +1,100 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>book</title>
+    <link rel="stylesheet" type="text/css" href="../css/book.css" />
 </head>
+
 <body>
+
     <body>
-    
+
         <h1>책 제목을 검색해주세요.</h1>
-    <input id="bookName" type="text">
-    <button id="search">검색</button>
-    <p></p>
+        <input id="bookName" type="text">
+        <button id="search">검색</button>
+        <div class="book_wrapper">
 
-    <script src="https://code.jquery.com/jquery-3.4.1.js"
-        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+        </div>
 
-    <script>
-        $(function () {
+        <script src="https://code.jquery.com/jquery-3.4.1.js"
+            integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 
-            $("#search").click(function () {
+        <script>
+            $(function () {
 
-                $.ajax({
-                    method: "GET",
-                    url: "https://dapi.kakao.com/v3/search/book?target=title", // 전송 주소
-                    data: { query: $("#bookName").val() }, // 보낼 데이터
-                    headers: { Authorization: "KakaoAK 3f14687256b2018b8b421e43e15cc864" }
+                $("#search").click(function () {
+                    $(".book_wrapper").html("");
+
+                    $.ajax({
+                        method: "GET",
+                        url: "https://dapi.kakao.com/v3/search/book?target=title", // 전송 주소
+                        data: { query: $("#bookName").val() }, // 보낼 데이터
+                        headers: { Authorization: "KakaoAK 3f14687256b2018b8b421e43e15cc864" }
+                    })
+                        .done(function (result) { // 응답이 오면 처리를 하는 코드
+
+                            $(result).each(function () {
+                                console.log(result);
+                                $(this.documents).each(function () {
+                                    var title = JSON.stringify(this.title).replace(/"/g, "");
+                                    var content = JSON.stringify(this.contents).replace(/"/g, "");
+                                    var img = (JSON.stringify(this.thumbnail)).replace(/"/g, "");
+
+                                    console.log(title);
+                                    console.log(content);
+                                    console.log(img);
+
+                                });
+                            });
+                        });
                 })
-                    .done(function (msg) { // 응답이 오면 처리를 하는 코드
-                    
-                        $("p").append("<strong>" + msg.documents[0].title + "</strong>");
-                        $("p").append("<img src='" + msg.documents[0].thumbnail + "'>");
-                    });
-            })
-        });
 
-    </script>
-</body>
+                $("#bookName").keydown(function (key) {
+
+                    //키의 코드가 13번일 경우 (13번은 엔터키)
+                    if (key.keyCode == 13) {
+                        $(".book_wrapper").html("");
+                        $.ajax({
+                            method: "GET",
+                            url: "https://dapi.kakao.com/v3/search/book?target=title", // 전송 주소
+                            data: { query: $("#bookName").val() }, // 보낼 데이터
+                            headers: { Authorization: "KakaoAK 3f14687256b2018b8b421e43e15cc864" }
+                        })
+                            .done(function (msg) { // 응답이 오면 처리를 하는 코드
+
+                                $(msg).each(function () {
+                                    console.log(msg);
+                                    $(this.documents).each(function () {
+                                        var title = JSON.stringify(this.title).replace(/"/g, "");
+                                        var content = JSON.stringify(this.contents).replace(/"/g, "");
+                                        var img = (JSON.stringify(this.thumbnail)).replace(/"/g, "");
+
+                                        console.log(title);
+                                        console.log(content);
+                                        console.log(img);
+
+                                        // 출력을 위한 동적 요소의 생성
+                                        var div = $("<div>").attr("id", "book");
+
+                                        var movie = $("<div>").attr("class", "movie__Column").html("<img src='" + img + "'alt=" + title + " title="
+                                            + title + " class='movie__Poster'>");
+
+                                        // 조립과 출력
+                                        div.append(movie);
+                                        $(".book_wrapper").append(div);
+
+                                    });
+                                });
+                            });
+                    }
+                });
+            });
+
+        </script>
+    </body>
+
 </html>
