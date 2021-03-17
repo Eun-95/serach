@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>book</title>
+</head>
+<body>
+    <body>
+    
+        <h1>책 제목을 검색해주세요.</h1>
+    <input id="bookName" type="text">
+    <button id="search">검색</button>
+    <p></p>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+
+    <script>
+        $(function () {
+
+            $("#search").click(function () {
+
+                $.ajax({
+                    method: "GET",
+                    url: "https://dapi.kakao.com/v3/search/book?target=title", // 전송 주소
+                    data: { query: $("#bookName").val() }, // 보낼 데이터
+                    headers: { Authorization: "KakaoAK 3f14687256b2018b8b421e43e15cc864" }
+                })
+                    .done(function (msg) { // 응답이 오면 처리를 하는 코드
+                    
+                        $("p").append("<strong>" + msg.documents[0].title + "</strong>");
+                        $("p").append("<img src='" + msg.documents[0].thumbnail + "'>");
+                    });
+            })
+        });
+
+    </script>
+</body>
+</html>
